@@ -28,7 +28,7 @@ export function Cursor() {
 
     const entity = world.spawn(
       Target,
-      Position({ x: target[0], y: target[1], z: target[2] }),
+      Position({ x: target[0], y: target[1], z: target[2] })
     );
 
     return () => {

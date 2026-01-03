@@ -38,6 +38,6 @@ export const useCursorPositionFromLand: ECSSystemHook = () => {
         });
       }
     },
-    [raycaster, pointer],
+    [raycaster, pointer]
   );
 };

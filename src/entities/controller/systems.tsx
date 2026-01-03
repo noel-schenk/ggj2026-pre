@@ -28,14 +28,14 @@ export const velocityTowardsTarget: ECSSystem = (world, delta) => {
       // Calculate a speed factor that gradually approaches zero as we near the target
       const speedFactor = Math.max(
         0,
-        Math.min(1, (distanceToTarget - stoppingDistance) / stoppingDistance),
+        Math.min(1, (distanceToTarget - stoppingDistance) / stoppingDistance)
       );
 
       // Apply the speed factor to smoothly transition to zero velocity
       const targetVelocity = multiply(
         normalize(subtract(targetPosition, position)),
         // Square for more natural deceleration
-        speed * speedFactor * speedFactor,
+        speed * speedFactor * speedFactor
       );
 
       entity.set(Velocity, targetVelocity);

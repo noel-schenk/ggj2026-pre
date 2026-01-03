@@ -1,6 +1,7 @@
 import { Camera } from "../entities/camera";
 import { Controller } from "../entities/controller";
 import { Cursor } from "../entities/cursor";
+import { Keyboard } from "../entities/keyboard";
 import { Land } from "../entities/land";
 
 export function DebugLevel() {
@@ -14,6 +15,7 @@ export function DebugLevel() {
         </mesh>
       </Controller>
       <Cursor />
+      <Keyboard />
       <Land>
         <mesh position={[0, -0.06, 0]} receiveShadow>
           <boxGeometry args={[6, 0.1, 6]} />
