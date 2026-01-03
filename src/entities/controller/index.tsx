@@ -3,6 +3,7 @@ import { useEffect, useRef } from "react";
 import { type Object3D } from "three";
 import { Focused, Mesh, Position, Velocity } from "../../shared/traits";
 import { Controllable, Speed } from "./traits";
+import { Keyboard } from "../keyboard/traits";
 
 export function Controller({
   children,
@@ -24,6 +25,7 @@ export function Controller({
 
     const entity = world.spawn(
       Controllable,
+      Keyboard,
       Focused,
       Mesh(ref.current),
       Position({ x, y, z }),

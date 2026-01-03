@@ -3,9 +3,10 @@ import { createWorld } from "koota";
 import { useWorld, WorldProvider } from "koota/react";
 import { createContext, use, useMemo, type ReactNode } from "react";
 import { cameraFollowFocused } from "../src/entities/camera/systems";
-import { velocityTowardsTarget } from "../src/entities/controller/systems";
+import { useVelocityTowardsTarget } from "../src/entities/controller/systems";
 import { useCursorPositionFromLand } from "../src/entities/land/systems";
 import { meshFromPosition, positionFromVelocity } from "../src/shared/systems";
+import { keyboardVelocitySystem } from "./entities/keyboard/systems";
 
 export function RootProviders({ children }: { children: ReactNode }) {
   const world = useMemo(() => createWorld(), []);
@@ -31,6 +32,7 @@ export function KootaSystems({
   const isNested = use(NestedCheck);
   const world = useWorld();
   const cursorPositionFromLand = useCursorPositionFromLand();
+  const velocityTowardsTarget = useVelocityTowardsTarget();
 
   useFrame((_, delta) => {
     if (isNested) {
@@ -43,6 +45,8 @@ export function KootaSystems({
       cursorPositionFromLand(world, delta);
     }
 
+    keyboardVelocitySystem(world, delta);
+    
     if (velocityTowardsTargetSystem) {
       velocityTowardsTarget(world, delta);
     }
