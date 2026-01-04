@@ -1,8 +1,9 @@
-import { type ReactNode } from "react";
-import { KootaSystems, RootProviders } from "../src/providers";
+import { type ReactNode } from 'react'
+
+import { KootaSystems, RootProviders } from '../src/providers'
 
 export function GlobalProvider({ children }: { children: ReactNode }) {
-  return <RootProviders>{children}</RootProviders>;
+  return <RootProviders>{children}</RootProviders>
 }
 
 export function CanvasProvider({
@@ -12,11 +13,11 @@ export function CanvasProvider({
   positionFromVelocitySystem = true,
   velocityTowardsTargetSystem = true,
 }: {
-  cameraFollowFocusedSystem?: boolean;
-  children: ReactNode;
-  cursorPositionFromLandSystem?: boolean;
-  positionFromVelocitySystem?: boolean;
-  velocityTowardsTargetSystem?: boolean;
+  cameraFollowFocusedSystem?: boolean
+  children: ReactNode
+  cursorPositionFromLandSystem?: boolean
+  positionFromVelocitySystem?: boolean
+  velocityTowardsTargetSystem?: boolean
 }) {
   return (
     <KootaSystems
@@ -27,5 +28,5 @@ export function CanvasProvider({
     >
       {children}
     </KootaSystems>
-  );
+  )
 }

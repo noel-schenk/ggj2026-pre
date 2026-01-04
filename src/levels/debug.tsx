@@ -1,11 +1,10 @@
-import { Camera } from "../entities/camera";
-import { Controller } from "../entities/controller";
-import { Cursor } from "../entities/cursor";
-import { Land } from "../entities/land";
+import '@react-three/p2'
+import { Physics } from '@react-three/p2'
 
-import { Debug, Physics, useBox, useCircle, usePlane } from '@react-three/p2'
-
-import { } from '@react-three/p2'
+import { Camera } from '../entities/camera'
+import { Controller } from '../entities/controller'
+import { Cursor } from '../entities/cursor'
+import { Land } from '../entities/land'
 
 export function DebugLevel() {
   return (
@@ -17,7 +16,7 @@ export function DebugLevel() {
           <meshStandardMaterial color="red" />
         </mesh>
       </Controller>
-      <Controller speed={5} position={[1,0,0]}>
+      <Controller speed={5} position={[1, 0, 0]}>
         <mesh castShadow position={[0, 0.5, 0]} receiveShadow>
           <boxGeometry args={[0.3, 1, 0.3]} />
           <meshStandardMaterial color="blue" />
@@ -25,7 +24,11 @@ export function DebugLevel() {
       </Controller>
       <Cursor />
       <Land>
-        <mesh position={[-5.55, 1.09, 0]} receiveShadow rotation={[0, 0, -0.43633231299858244]}>
+        <mesh
+          position={[-5.55, 1.09, 0]}
+          receiveShadow
+          rotation={[0, 0, -0.43633231299858244]}
+        >
           <boxGeometry args={[6, 0.1, 6]} />
           <meshStandardMaterial color="white" />
         </mesh>
@@ -47,5 +50,5 @@ export function DebugLevel() {
         shadow-mapSize-width={1024}
       />
     </Physics>
-  );
+  )
 }

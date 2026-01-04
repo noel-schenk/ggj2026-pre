@@ -1,5 +1,5 @@
-import { trait } from "koota";
+import { trait } from 'koota'
 
-export const Controllable = trait();
+export const Controllable = trait()
 
-export const Speed = trait({ value: 1 });
+export const Speed = trait({ value: 1 })

@@ -1,6 +1,7 @@
-import { Canvas } from "@react-three/fiber";
-import { DebugLevel } from "./levels/debug";
-import { KootaSystems } from "./providers";
+import { Canvas } from '@react-three/fiber'
+
+import { DebugLevel } from './levels/debug'
+import { KootaSystems } from './providers'
 
 export function App() {
   return (
@@ -9,5 +10,5 @@ export function App() {
         <DebugLevel />
       </KootaSystems>
     </Canvas>
-  );
+  )
 }

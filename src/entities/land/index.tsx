@@ -1,27 +1,26 @@
-import { useWorld } from "koota/react";
-import { useEffect, useRef, type ReactNode } from "react";
-import { type Object3D } from "three";
-import { Mesh } from "../../shared/traits";
-import { Land as LandTrait } from "./traits";
-import { usePlane, Physics } from "@react-three/p2";
+import { type ReactNode, useEffect } from 'react'
+
+import { usePlane } from '@react-three/p2'
+import { useWorld } from 'koota/react'
+
+import { Mesh } from '../../shared/traits'
+import { Land as LandTrait } from './traits'
 
 export function Land({ children }: { children: ReactNode }) {
-  const world = useWorld();
-  const [refPhys] = usePlane(() => ({ mass: 0, position: [0, 0] }));
+  const world = useWorld()
+  const [refPhys] = usePlane(() => ({ mass: 0, position: [0, 0] }))
 
   useEffect(() => {
     if (!refPhys.current) {
-      return;
+      return
     }
 
-    const entity = world.spawn(Mesh(refPhys.current), LandTrait);
+    const entity = world.spawn(Mesh(refPhys.current), LandTrait)
 
     return () => {
-      entity.destroy();
-    };
-  }, [world]);
+      entity.destroy()
+    }
+  }, [world])
 
-  return <group ref={refPhys}>
-      {children}
-  </group>;
+  return <group ref={refPhys}>{children}</group>
 }

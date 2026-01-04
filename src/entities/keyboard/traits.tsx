@@ -1,3 +1,3 @@
-import { trait } from "koota";
+import { trait } from 'koota'
 
-export const Keyboard = trait();
+export const Keyboard = trait()
