@@ -1,6 +1,6 @@
 {
   "$schema": "https://www.partykit.io/schema.json",
-  "name": "ggj2026-party",
+  "compatibilityDate": "2026-01-04",
   "main": "party/index.ts",
-  "compatibilityDate": "2026-01-04"
+  "name": "ggj2026-party"
 }

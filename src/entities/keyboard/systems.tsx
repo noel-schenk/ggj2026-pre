@@ -1,7 +1,8 @@
+import { Position, Velocity } from '@/shared/traits'
+import { type ECSSystem } from '@/types'
+
 import { Vector3 } from 'three'
 
-import { Position, Velocity } from '../../shared/traits'
-import { type ECSSystem } from '../../types'
 import { Keyboard } from './traits'
 
 const keyDown = new Set() as Set<string>
@@ -11,7 +12,7 @@ const keyDown = new Set() as Set<string>
  * position. If there is no focused entity or camera entity no changes are
  * made.
  */
-export const keyboardVelocitySystem: ECSSystem = (world, delta) => {
+export const keyboardVelocitySystem: ECSSystem = (world, _delta) => {
   const controllables = world.query(Keyboard, Position, Velocity)
 
   if (controllables.length === 0) {

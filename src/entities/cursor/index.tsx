@@ -1,22 +1,23 @@
+import { Mesh, Position, Target } from '@/shared/traits'
+
 import { useEffect, useRef, useState } from 'react'
 
 import { useWorld } from 'koota/react'
 import { type Object3D, type Vector3Tuple } from 'three'
 
-import { Mesh, Position, Target } from '../../shared/traits'
 import { Cursor as CursorTrait } from './traits'
 
 export function Cursor() {
   const world = useWorld()
-  const ref = useRef<Object3D>(null)
+  const cursorRef = useRef<Object3D>(null)
   const [target, setTarget] = useState<Vector3Tuple>()
 
   useEffect(() => {
-    if (!ref.current) {
+    if (!cursorRef.current) {
       return
     }
 
-    const entity = world.spawn(Mesh(ref.current), CursorTrait, Position)
+    const entity = world.spawn(Mesh(cursorRef.current), CursorTrait, Position)
 
     return () => {
       entity.destroy()
@@ -48,7 +49,7 @@ export function Cursor() {
   }
 
   return (
-    <mesh onClick={handleCursorClick} ref={ref}>
+    <mesh onClick={handleCursorClick} ref={cursorRef}>
       <sphereGeometry args={[0.1]} />
       <meshBasicMaterial
         color="white"

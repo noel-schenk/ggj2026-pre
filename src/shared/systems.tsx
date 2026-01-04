@@ -1,5 +1,6 @@
-import { add, multiply } from '../shared/math'
-import { type ECSSystem } from '../types'
+import { add, multiply } from '@/shared/math'
+import { type ECSSystem } from '@/types'
+
 import { Mesh, Position, Velocity } from './traits'
 
 /** Copies the position trait value to the Three.js mesh position. */

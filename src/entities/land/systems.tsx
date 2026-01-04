@@ -1,10 +1,11 @@
+import { Cursor } from '@/entities/cursor/traits'
+import { Mesh, Position } from '@/shared/traits'
+import { type ECSSystemHook } from '@/types'
+
 import { useCallback } from 'react'
 
 import { useThree } from '@react-three/fiber'
 
-import { Mesh, Position } from '../../shared/traits'
-import { type ECSSystemHook } from '../../types'
-import { Cursor } from '../cursor/traits'
 import { Land } from './traits'
 
 /**

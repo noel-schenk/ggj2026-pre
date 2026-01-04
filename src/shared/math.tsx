@@ -1,6 +1,6 @@
-import { MathUtils } from 'three'
+import { type Vector3 } from '@/types'
 
-import { type Vector3 } from '../types'
+import { MathUtils } from 'three'
 
 /** Multiplies all values of a vector by an amount. */
 export function multiply(v: Vector3, scalar: number | undefined = 1): Vector3 {

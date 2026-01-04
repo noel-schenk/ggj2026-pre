@@ -1,9 +1,10 @@
+import { Mesh } from '@/shared/traits'
+
 import { type ReactNode, useEffect } from 'react'
 
 import { usePlane } from '@react-three/p2'
 import { useWorld } from 'koota/react'
 
-import { Mesh } from '../../shared/traits'
 import { Land as LandTrait } from './traits'
 
 export function Land({ children }: { children: ReactNode }) {

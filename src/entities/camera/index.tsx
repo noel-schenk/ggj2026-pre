@@ -1,10 +1,11 @@
+import { Mesh, Position } from '@/shared/traits'
+
 import { useEffect, useRef } from 'react'
 
 import { OrthographicCamera } from '@react-three/drei'
 import { useWorld } from 'koota/react'
 import { type OrthographicCamera as OrthographicCameraImpl } from 'three'
 
-import { Mesh, Position } from '../../shared/traits'
 import { Camera as CameraTrait } from './traits'
 
 export function Camera({
@@ -15,18 +16,18 @@ export function Camera({
   rotation?: [x: number, y: number, z: number]
 }) {
   const world = useWorld()
-  const ref = useRef<OrthographicCameraImpl>(null)
+  const cameraRef = useRef<OrthographicCameraImpl>(null)
   const [x, y, z] = position
 
   useEffect(() => {
-    if (!ref.current) {
+    if (!cameraRef.current) {
       return
     }
 
     const entity = world.spawn(
       CameraTrait,
       Position({ x, y, z }),
-      Mesh(ref.current)
+      Mesh(cameraRef.current)
     )
 
     return () => {
@@ -35,6 +36,11 @@ export function Camera({
   }, [world, x, y, z])
 
   return (
-    <OrthographicCamera makeDefault ref={ref} rotation={rotation} zoom={100} />
+    <OrthographicCamera
+      makeDefault
+      ref={cameraRef}
+      rotation={rotation}
+      zoom={100}
+    />
   )
 }

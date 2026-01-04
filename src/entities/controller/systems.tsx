@@ -1,12 +1,13 @@
+import { Land } from '@/entities/land/traits'
+import { distance, multiply, normalize, subtract } from '@/shared/math'
+import { Mesh, Position, Target, Velocity } from '@/shared/traits'
+import { ECSSystemHook } from '@/types'
+
 import { useCallback } from 'react'
 
 import { useThree } from '@react-three/fiber'
 import { Vector3 } from 'three'
 
-import { distance, multiply, normalize, subtract } from '../../shared/math'
-import { Mesh, Position, Target, Velocity } from '../../shared/traits'
-import { ECSSystemHook } from '../../types'
-import { Land } from '../land/traits'
 import { Controllable, Speed } from './traits'
 
 /**

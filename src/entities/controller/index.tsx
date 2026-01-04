@@ -1,10 +1,12 @@
+import { Keyboard } from '@/entities/keyboard/traits'
+import { Authority } from '@/multiplayer/traits'
+import { Focused, Mesh, Position, Velocity } from '@/shared/traits'
+
 import { useEffect, useRef } from 'react'
 
 import { useWorld } from 'koota/react'
 import { type Object3D } from 'three'
 
-import { Focused, Mesh, Position, Velocity } from '../../shared/traits'
-import { Keyboard } from '../keyboard/traits'
 import { Controllable, Speed } from './traits'
 
 export function Controller({
@@ -17,19 +19,20 @@ export function Controller({
   speed?: number
 }) {
   const world = useWorld()
-  const ref = useRef<Object3D>(null)
+  const controllerRef = useRef<Object3D>(null)
   const [x, y, z] = position
 
   useEffect(() => {
-    if (!ref.current) {
+    if (!controllerRef.current) {
       return
     }
 
     const entity = world.spawn(
+      Authority,
       Controllable,
       Keyboard,
       Focused,
-      Mesh(ref.current),
+      Mesh(controllerRef.current),
       Position({ x, y, z }),
       Speed({ value: speed }),
       Velocity
@@ -40,5 +43,5 @@ export function Controller({
     }
   }, [speed, world, x, y, z])
 
-  return <group ref={ref}>{children}</group>
+  return <group ref={controllerRef}>{children}</group>
 }

@@ -1,13 +1,14 @@
+import { cameraFollowFocused } from '@/entities/camera/systems'
+import { useVelocityTowardsTarget } from '@/entities/controller/systems'
+import { useCursorPositionFromLand } from '@/entities/land/systems'
+import { meshFromPosition, positionFromVelocity } from '@/shared/systems'
+
 import { type ReactNode, createContext, use, useMemo } from 'react'
 
 import { useFrame } from '@react-three/fiber'
 import { createWorld } from 'koota'
 import { WorldProvider, useWorld } from 'koota/react'
 
-import { cameraFollowFocused } from '../src/entities/camera/systems'
-import { useVelocityTowardsTarget } from '../src/entities/controller/systems'
-import { useCursorPositionFromLand } from '../src/entities/land/systems'
-import { meshFromPosition, positionFromVelocity } from '../src/shared/systems'
 import { keyboardVelocitySystem } from './entities/keyboard/systems'
 
 export function RootProviders({ children }: { children: ReactNode }) {
@@ -16,7 +17,7 @@ export function RootProviders({ children }: { children: ReactNode }) {
   return <WorldProvider world={world}>{children}</WorldProvider>
 }
 
-const NestedCheck = createContext(false)
+const NestedCheckContext = createContext(false)
 
 export function KootaSystems({
   cameraFollowFocusedSystem = true,
@@ -31,7 +32,7 @@ export function KootaSystems({
   positionFromVelocitySystem?: boolean
   velocityTowardsTargetSystem?: boolean
 }) {
-  const isNested = use(NestedCheck)
+  const isNested = use(NestedCheckContext)
   const world = useWorld()
   const cursorPositionFromLand = useCursorPositionFromLand()
   const velocityTowardsTarget = useVelocityTowardsTarget()
@@ -64,5 +65,5 @@ export function KootaSystems({
     }
   })
 
-  return <NestedCheck value>{children}</NestedCheck>
+  return <NestedCheckContext value>{children}</NestedCheckContext>
 }
