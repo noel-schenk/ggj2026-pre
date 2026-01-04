@@ -10,3 +10,11 @@ export const Mesh = trait(() => new Object3D())
 export const Focused = trait()
 
 export const Target = trait()
+
+export const SyncTrait = trait({ id: -1 })
+
+export const SyncedTraits = {
+  position: Position,
+  sync: SyncTrait,
+  velocity: Velocity,
+}

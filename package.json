@@ -14,7 +14,7 @@
     "koota": "^0.6.2",
     "lodash-es": "^4.17.22",
     "p2-es": "^1.2.3",
-    "partysocket": "1.1.10",
+    "partysocket": "^1.1.10",
     "react": "^19.2.3",
     "react-dom": "^19.1.0",
     "three": "^0.182.0",
@@ -47,7 +47,7 @@
   "scripts": {
     "build": "vite build",
     "dev": "vite",
-    "devserver": "partykit dev",
+    "server": "partykit dev",
     "format": "eslint . --fix && prettier --write .",
     "prepare": "husky",
     "typecheck": "tsc"

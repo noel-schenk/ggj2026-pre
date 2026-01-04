@@ -10,13 +10,13 @@ export function DebugLevel() {
   return (
     <Physics normalIndex={2}>
       <Camera position={[0, 3, 0]} rotation={[-0.87, -0.56, -0.57]} />
-      <Controller speed={5}>
+      <Controller speed={5} syncId={6}>
         <mesh castShadow position={[0, 0.5, 0]} receiveShadow>
           <boxGeometry args={[0.3, 1, 0.3]} />
           <meshStandardMaterial color="red" />
         </mesh>
       </Controller>
-      <Controller speed={5} position={[1, 0, 0]}>
+      <Controller speed={5} position={[1, 0, 0]} syncId={7}>
         <mesh castShadow position={[0, 0.5, 0]} receiveShadow>
           <boxGeometry args={[0.3, 1, 0.3]} />
           <meshStandardMaterial color="blue" />

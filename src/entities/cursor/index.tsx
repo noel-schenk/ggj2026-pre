@@ -1,3 +1,5 @@
+import { Controllable } from '@/entities/controller/traits'
+import { Authority } from '@/multiplayer/traits'
 import { Mesh, Position, Target } from '@/shared/traits'
 
 import { useEffect, useRef, useState } from 'react'
@@ -46,6 +48,11 @@ export function Cursor() {
     }
 
     setTarget([cursorPosition.x, cursorPosition.y, cursorPosition.z])
+
+    const controllable = world.query(Controllable)
+    controllable?.forEach(controllableEntity =>
+      controllableEntity.add(Authority)
+    ) // TODO: remove only to test authority
   }
 
   return (

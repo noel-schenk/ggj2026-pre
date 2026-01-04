@@ -1,6 +1,5 @@
 import { Keyboard } from '@/entities/keyboard/traits'
-import { Authority } from '@/multiplayer/traits'
-import { Focused, Mesh, Position, Velocity } from '@/shared/traits'
+import { Focused, Mesh, Position, SyncTrait, Velocity } from '@/shared/traits'
 
 import { useEffect, useRef } from 'react'
 
@@ -13,10 +12,12 @@ export function Controller({
   children,
   position = [0, 0, 0],
   speed = 1,
+  syncId = 42,
 }: {
   children: React.ReactNode
   position?: [x: number, y: number, z: number]
   speed?: number
+  syncId?: number
 }) {
   const world = useWorld()
   const controllerRef = useRef<Object3D>(null)
@@ -28,7 +29,7 @@ export function Controller({
     }
 
     const entity = world.spawn(
-      Authority,
+      SyncTrait({ id: syncId }),
       Controllable,
       Keyboard,
       Focused,

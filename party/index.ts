@@ -6,10 +6,11 @@ export default class Server implements Party.Server {
   onConnect(conn: Party.Connection, ctx: Party.ConnectionContext) {
     // A websocket just connected!
     console.log(
-      `Connected:
-  id: ${conn.id}
-  room: ${this.room.id}
-  url: ${new URL(ctx.request.url).pathname}`
+      `
+        Connected:
+        id: ${conn.id}
+        room: ${this.room.id}
+        url: ${new URL(ctx.request.url).pathname}`
     )
 
     // let's send a message to the connection
@@ -21,7 +22,7 @@ export default class Server implements Party.Server {
     console.log(`connection ${sender.id} sent message: ${message}`)
     // as well as broadcast it to all the other connections in the room...
     this.room.broadcast(
-      `${sender.id}: ${message}`,
+      btoa(JSON.stringify({ message: message, sender: sender.id })),
       // ...except for the connection it came from
       [sender.id]
     )
