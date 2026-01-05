@@ -15,8 +15,7 @@ import {
 
 import { useEffect, useRef, useState } from 'react'
 
-import '@react-three/p2'
-import { Physics } from '@react-three/p2'
+import { RigidBody } from '@react-three/rapier'
 import { Container, Text } from '@react-three/uikit'
 import { Button, Input, Label } from '@react-three/uikit-default'
 import { useWorld } from 'koota/react'
@@ -93,7 +92,7 @@ export const MenuLevel = () => {
   }
 
   return (
-    <Physics normalIndex={2}>
+    <>
       <Camera />
 
       {/* UI */}
@@ -150,23 +149,31 @@ export const MenuLevel = () => {
 
       <Cursor />
       <Land>
-        <mesh
-          position={[-5.55, 1.09, 0]}
-          receiveShadow
-          rotation={[0, 0, -0.43633231299858244]}
-        >
-          <boxGeometry args={[6, 0.1, 6]} />
-          <meshStandardMaterial color="white" />
-        </mesh>
-        <mesh position={[0, -0.06, 0]} receiveShadow>
-          <boxGeometry args={[6, 0.1, 6]} />
-          <meshStandardMaterial color="white" />
-        </mesh>
-        <mesh position={[0, 0, -3.41]} receiveShadow>
-          <boxGeometry args={[1, 1, 1]} />
-          <meshStandardMaterial color="white" />
-        </mesh>
+        <RigidBody type="fixed" colliders={'hull'} restitution={0}>
+          <mesh
+            position={[-5.55, 1.09, 0]}
+            receiveShadow
+            rotation={[0, 0, -0.43633231299858244]}
+          >
+            <boxGeometry args={[6, 0.1, 6]} />
+            <meshStandardMaterial color="white" />
+          </mesh>
+          <mesh position={[0, -0.06, 0]} receiveShadow>
+            <boxGeometry args={[6, 0.1, 6]} />
+            <meshStandardMaterial color="white" />
+          </mesh>
+          <mesh position={[0, 0, -3.41]} receiveShadow>
+            <boxGeometry args={[1, 1, 1]} />
+            <meshStandardMaterial color="white" />
+          </mesh>
+        </RigidBody>
       </Land>
+      <RigidBody colliders={'ball'} type="fixed">
+        <mesh position={[-6, 5, 0]} receiveShadow>
+          <sphereGeometry></sphereGeometry>
+        </mesh>
+      </RigidBody>
+
       <ambientLight />
       <directionalLight
         castShadow
@@ -175,6 +182,6 @@ export const MenuLevel = () => {
         shadow-mapSize-height={1024}
         shadow-mapSize-width={1024}
       />
-    </Physics>
+    </>
   )
 }
