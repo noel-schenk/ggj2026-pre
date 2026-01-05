@@ -34,8 +34,6 @@ export const keyboardVelocitySystem: ECSSystem = (world, _delta) => {
     if (keyDown.has('a')) newVelocity.add(new Vector3(-step, 0, 0))
     if (keyDown.has('d')) newVelocity.add(new Vector3(step, 0, 0))
 
-    console.log('set velocity')
-
     controllable.set(Velocity, newVelocity)
   }
 }

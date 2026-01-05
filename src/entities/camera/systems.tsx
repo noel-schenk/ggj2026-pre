@@ -1,7 +1,7 @@
 import { Controllable } from '@/entities/controller/traits'
 import { Authority } from '@/multiplayer/traits'
 import { damp } from '@/shared/math'
-import { Position } from '@/shared/traits'
+import { Position, RigidBody } from '@/shared/traits'
 import { mainState } from '@/state'
 import { type ECSSystem, type Vector3 } from '@/types'
 
@@ -13,22 +13,25 @@ import { Camera } from './traits'
  * made.
  */
 export const cameraFollowFocused: ECSSystem = (world, delta) => {
-  const focused = world.queryFirst(Authority, Controllable, Position)
+  const focused = world.queryFirst(Authority, Controllable, RigidBody)
   const camera = world.queryFirst(Camera, Position)
 
-  const focusedPosition = focused?.get(Position)
+  const focusedRigidBody = focused?.get(RigidBody)
   const cameraPosition = camera?.get(Position)
 
-  if (!camera || !cameraPosition || !focusedPosition) return
+  if (!camera || !cameraPosition || !focusedRigidBody) return
 
   if (!mainState.cameraFollowPlayer) return
+
+  const pos = focusedRigidBody.translation()
+  // const pos = focusedMesh.getWorldPosition(new v3(0,0,0));
 
   const lambda = 5
   const offset = { x: 6, z: 12 }
   const target: Vector3 = {
-    x: focusedPosition.x - offset.x,
+    x: pos.x - offset.x,
     y: cameraPosition.y,
-    z: focusedPosition.z + offset.z,
+    z: pos.z + offset.z,
   }
 
   if (cameraPosition.x === 0 && cameraPosition.z === 0) {

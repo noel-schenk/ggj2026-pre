@@ -1,27 +1,27 @@
 import { Mesh } from '@/shared/traits'
 
-import { type ReactNode, useEffect } from 'react'
+import { type ReactNode, useEffect, useRef } from 'react'
 
-import { usePlane } from '@react-three/p2'
 import { useWorld } from 'koota/react'
+import { Object3D } from 'three'
 
 import { Land as LandTrait } from './traits'
 
 export function Land({ children }: { children: ReactNode }) {
   const world = useWorld()
-  const [refPhys] = usePlane(() => ({ mass: 0, position: [0, 0] }))
+  const landRef = useRef<Object3D>(null)
 
   useEffect(() => {
-    if (!refPhys.current) {
+    if (!landRef.current) {
       return
     }
 
-    const entity = world.spawn(Mesh(refPhys.current), LandTrait)
+    const entity = world.spawn(Mesh(landRef.current), LandTrait)
 
     return () => {
       entity.destroy()
     }
   }, [world])
 
-  return <group ref={refPhys}>{children}</group>
+  return <group ref={landRef}>{children}</group>
 }

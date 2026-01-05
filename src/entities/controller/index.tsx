@@ -1,18 +1,32 @@
 import { Keyboard } from '@/entities/keyboard/traits'
 import { Authority } from '@/multiplayer/traits'
-import { Focused, Mesh, Position, SyncTrait, Velocity } from '@/shared/traits'
+import {
+  Focused,
+  Mesh,
+  Position,
+  RigidBody,
+  SyncTrait,
+  Velocity,
+} from '@/shared/traits'
 import { useGetSyncTraitsFromSyncTraitId } from '@/utils'
 
 import { useEffect, useRef } from 'react'
 
+import {
+  MeshCollider,
+  RapierRigidBody,
+  RigidBody as RigidBodyComponent,
+} from '@react-three/rapier'
+import { Text } from '@react-three/uikit'
+import { Label } from '@react-three/uikit-default'
 import { useWorld } from 'koota/react'
-import { type Object3D, Vector3 } from 'three'
+import { Object3D, Vector3 } from 'three'
 
 import { Controllable, Speed } from './traits'
 
 export function Controller({
   children,
-  position = new Vector3(0, 0, 2),
+  position = new Vector3(0, 0, 0),
   speed = 1,
   authority,
   syncId = '',
@@ -24,7 +38,8 @@ export function Controller({
   syncId?: string
 }) {
   const world = useWorld()
-  const controllerRef = useRef<Object3D>(null)
+  const controllerRef = useRef<RapierRigidBody>(null)
+  const meshRef = useRef<Object3D>(null)
 
   const syncedTraits = useGetSyncTraitsFromSyncTraitId(syncId)
 
@@ -38,7 +53,8 @@ export function Controller({
       Controllable,
       Keyboard,
       Focused,
-      Mesh(controllerRef.current),
+      Mesh(meshRef.current as any),
+      RigidBody(controllerRef.current as any),
       Position(syncedTraits.position ? syncedTraits.position : position),
       Speed({ value: speed }),
       Velocity
@@ -51,5 +67,25 @@ export function Controller({
     }
   }, [speed, world, position])
 
-  return <group ref={controllerRef}>{children}</group>
+  return (
+    <>
+      <RigidBodyComponent
+        canSleep={false}
+        type="dynamic"
+        colliders={false}
+        linearDamping={4}
+        angularDamping={5}
+        mass={100}
+        ref={controllerRef}
+      >
+        <MeshCollider type="ball">{children}</MeshCollider>
+      </RigidBodyComponent>
+      <group ref={meshRef}>
+        <Label>
+          <Text>{JSON.stringify(position)}</Text>
+        </Label>
+        {children}
+      </group>
+    </>
+  )
 }

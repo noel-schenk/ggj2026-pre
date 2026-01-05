@@ -1,7 +1,7 @@
 import { cameraFollowFocused } from '@/entities/camera/systems'
 import { useVelocityTowardsTarget } from '@/entities/controller/systems'
 import { useCursorPositionFromLand } from '@/entities/land/systems'
-import { meshFromPosition, positionFromVelocity } from '@/shared/systems'
+import { meshFromPosition } from '@/shared/systems'
 
 import { type ReactNode, createContext, use } from 'react'
 
@@ -23,7 +23,6 @@ export function KootaSystems({
   cameraFollowFocusedSystem = true,
   children,
   cursorPositionFromLandSystem = true,
-  positionFromVelocitySystem = true,
   velocityTowardsTargetSystem = true,
 }: {
   cameraFollowFocusedSystem?: boolean
@@ -52,10 +51,6 @@ export function KootaSystems({
 
     if (velocityTowardsTargetSystem) {
       velocityTowardsTarget(world, delta)
-    }
-
-    if (positionFromVelocitySystem) {
-      positionFromVelocity(world, delta)
     }
 
     meshFromPosition(world, delta)
