@@ -13,12 +13,15 @@
     "assert": "^2.1.0",
     "koota": "^0.6.2",
     "lodash-es": "^4.17.22",
+    "mitt": "^3.0.1",
     "p2-es": "^1.2.3",
     "partysocket": "^1.1.10",
     "react": "^19.2.3",
     "react-dom": "^19.1.0",
+    "react-jsx-parser": "^2.4.1",
     "three": "^0.182.0",
     "typescript": "^5.8.3",
+    "valtio": "^2.3.0",
     "vite": "^7.3.0"
   },
   "devDependencies": {

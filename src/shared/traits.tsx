@@ -11,7 +11,7 @@ export const Focused = trait()
 
 export const Target = trait()
 
-export const SyncTrait = trait({ id: -1 })
+export const SyncTrait = trait({ id: '' })
 
 export const SyncedTraits = {
   position: Position,

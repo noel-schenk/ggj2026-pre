@@ -1,28 +1,31 @@
 import { SyncTrait, SyncedTraits } from '@/shared/traits'
+import { mainState } from '@/store'
 
-import { useEffect } from 'react'
+import React, { useEffect } from 'react'
 
 import { useWorld } from 'koota/react'
 import { attempt, isError, isNil } from 'lodash-es'
 import usePartySocket from 'partysocket/react'
+import { subscribeKey } from 'valtio/utils'
 
+import { Parse } from './parse'
 import { Authority } from './traits'
 
 type SyncedTraitsData = {
   [K in keyof typeof SyncedTraits]: any
 }[]
 
-const encode = (object: any) => btoa(JSON.stringify(object))
+export const encode = (object: any) => btoa(JSON.stringify(object))
 
-const decode = (message: any) => JSON.parse(atob(message))
+export const decode = (message: any) => JSON.parse(atob(message))
 
 export const Multiplayer = () => {
   const world = useWorld()
 
-  const onPartyData = (message: string) => {
-    if (isError(attempt(decode, message))) return
+  subscribeKey(mainState, 'partyData', () => {
+    if (isError(attempt(decode, mainState.partyData))) return
 
-    const data = decode(message) // encoded by server
+    const data = decode(mainState.partyData) // encoded by server
 
     if (isNil(data.message)) return
 
@@ -47,9 +50,9 @@ export const Multiplayer = () => {
         entityToSync.set(traitToSync, syncData) // this syncs the trait data
       })
     })
-  }
+  })
 
-  const party = usePartySocket({
+  mainState.party = usePartySocket({
     host: import.meta.env.VITE_MULTIPLAYER_SERVER,
 
     onClose() {
@@ -61,8 +64,7 @@ export const Multiplayer = () => {
     },
 
     onMessage(e) {
-      onPartyData(e.data)
-      console.log('message', e.data)
+      mainState.partyData = e.data
     },
     // TODO: make use of rooms
     onOpen() {
@@ -86,13 +88,14 @@ export const Multiplayer = () => {
           )
         )
 
-      party.send(
+      if (isNil(mainState.party)) return
+      mainState.party.send(
         encode({
           data: entityWithSyncedTraitsData,
           type: 'multiplayer-sync',
         })
       )
-    }, 1) // this is how often the state gets syncd
+    }, 1) // this is how often the state gets synct
 
     return () => clearInterval(interval)
   }, [])
@@ -100,4 +103,58 @@ export const Multiplayer = () => {
   console.log(import.meta.env.VITE_MULTIPLAYER_SERVER)
 
   return <></>
+}
+
+interface MultiplayerPortalProps {
+  children: string
+  id: string
+  onUpdate: (data: string) => void
+}
+/**
+ * Behaves like a portal between two instances
+ * Will sync everything you pass into it
+ * @param children
+ * @param id unique and static id to identify the Portal on the other side
+ * @param onUpdate when other Clients try to update this Client
+ * @returns
+ */
+export const MultiplayerPortal = ({
+  children,
+  id,
+  onUpdate,
+}: MultiplayerPortalProps) => {
+  useEffect(() => {
+    if (isNil(mainState.party)) return
+
+    const unsubscribe = subscribeKey(mainState, 'partyData', () => {
+      if (isError(attempt(decode, mainState.partyData))) return
+
+      const data = decode(mainState.partyData)
+      const spawnData = decode(data.message)
+
+      if (spawnData.type !== 'multiplayer-spawn') return
+
+      const childrenData = spawnData.data
+
+      if (childrenData.id === id) onUpdate(childrenData.children)
+    })
+
+    return unsubscribe
+  }, [mainState.party])
+
+  return <Parse tsx={children} />
+}
+
+export const updateMultiplayerPortal = (id: string, children: string) => {
+  if (isNil(mainState.party)) return
+
+  mainState.party.send(
+    encode({
+      data: {
+        children: children,
+        id: id,
+      },
+      type: 'multiplayer-spawn',
+    })
+  )
 }

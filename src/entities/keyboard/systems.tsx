@@ -1,9 +1,9 @@
-import { Position, Velocity } from '@/shared/traits'
+import { Controllable } from '@/entities/controller/traits'
+import { Authority } from '@/multiplayer/traits'
+import { Velocity } from '@/shared/traits'
 import { type ECSSystem } from '@/types'
 
 import { Vector3 } from 'three'
-
-import { Keyboard } from './traits'
 
 const keyDown = new Set() as Set<string>
 
@@ -13,7 +13,7 @@ const keyDown = new Set() as Set<string>
  * made.
  */
 export const keyboardVelocitySystem: ECSSystem = (world, _delta) => {
-  const controllables = world.query(Keyboard, Position, Velocity)
+  const controllables = world.query(Authority, Controllable)
 
   if (controllables.length === 0) {
     return

@@ -1,27 +1,80 @@
 import { Camera } from '@/entities/camera'
-import { Controller } from '@/entities/controller'
 import { Cursor } from '@/entities/cursor'
 import { Land } from '@/entities/land'
+import { MultiplayerPortal, updateMultiplayerPortal } from '@/multiplayer'
+import { Authority } from '@/multiplayer/traits'
+import { SyncTrait } from '@/shared/traits'
 
+import { useState } from 'react'
+
+import { Html } from '@react-three/drei'
 import '@react-three/p2'
 import { Physics } from '@react-three/p2'
+import { useWorld } from 'koota/react'
+import { Vector3 } from 'three'
 
 export function DebugLevel() {
+  const world = useWorld()
+
+  const PLAYER_SPAWNER_ID = 'player-spawner' as const
+  const [playerGroup, setPlayerGroup] = useState(``)
+  const [playerNameToSpawn, setPlayerNameToSpawn] = useState('42')
+
+  const updateAuthorityOnPlayerGroup = () => {
+    setTimeout(() => {
+      world
+        .query(SyncTrait)
+        .find(entity => entity.get(SyncTrait)?.id === playerNameToSpawn)
+        ?.add(Authority)
+    }, 1000)
+  }
+
+  const onUpdatePlayerGroup = (data: string) => {
+    setPlayerGroup(data)
+    updateAuthorityOnPlayerGroup()
+  }
+
+  const joinPlayer = () => {
+    const newPlayerGroup = `
+            ${playerGroup}
+            <Controller speed={5} syncId={'${playerNameToSpawn}'}>
+              <mesh castShadow position={[0, 0.5, 0]} receiveShadow>
+                <boxGeometry args={[0.3, 1, 0.3]} />
+                <meshStandardMaterial color="blue" />
+              </mesh>
+            </Controller>`
+
+    updateMultiplayerPortal(PLAYER_SPAWNER_ID, newPlayerGroup) // Update remote Clients
+    setPlayerGroup(newPlayerGroup) // Update this client
+    updateAuthorityOnPlayerGroup()
+  }
+
   return (
     <Physics normalIndex={2}>
       <Camera position={[0, 3, 0]} rotation={[-0.87, -0.56, -0.57]} />
-      <Controller speed={5} syncId={6}>
-        <mesh castShadow position={[0, 0.5, 0]} receiveShadow>
-          <boxGeometry args={[0.3, 1, 0.3]} />
-          <meshStandardMaterial color="red" />
-        </mesh>
-      </Controller>
-      <Controller speed={5} position={[1, 0, 0]} syncId={7}>
-        <mesh castShadow position={[0, 0.5, 0]} receiveShadow>
-          <boxGeometry args={[0.3, 1, 0.3]} />
-          <meshStandardMaterial color="blue" />
-        </mesh>
-      </Controller>
+
+      {/* UI */}
+
+      <Html position={new Vector3(0, 0, 0)} center>
+        <input
+          onChange={ev => setPlayerNameToSpawn(ev.target.value)}
+          value={playerNameToSpawn}
+        />
+        <button
+          style={{
+            cursor: 'pointer',
+            padding: '10px 20px',
+          }}
+          onClick={() => joinPlayer()}
+        >
+          Join
+        </button>
+      </Html>
+
+      <MultiplayerPortal id={PLAYER_SPAWNER_ID} onUpdate={onUpdatePlayerGroup}>
+        {playerGroup}
+      </MultiplayerPortal>
+
       <Cursor />
       <Land>
         <mesh
