@@ -5,15 +5,22 @@ import { MultiplayerPortal, updateMultiplayerPortal } from '@/multiplayer'
 import { Authority } from '@/multiplayer/traits'
 import { SyncTrait } from '@/shared/traits'
 import { mainState } from '@/state'
-import { arrayToVector3, getNewUsername, lerpVector3, px, uuid } from '@/utils'
+import {
+  arrayToVector3,
+  getNewUsername,
+  lerpVector3,
+  numberToColor,
+  uuid,
+} from '@/utils'
 
 import { useEffect, useRef, useState } from 'react'
 
 import '@react-three/p2'
 import { Physics } from '@react-three/p2'
 import { Container, Text } from '@react-three/uikit'
-import { Button, Input } from '@react-three/uikit-default'
+import { Button, Input, Label } from '@react-three/uikit-default'
 import { useWorld } from 'koota/react'
+import { random } from 'lodash-es'
 
 export const MenuLevel = () => {
   const world = useWorld()
@@ -24,6 +31,9 @@ export const MenuLevel = () => {
   const [playerGroup, setPlayerGroup] = useState(``)
   const [playerNameToSpawn, setPlayerNameToSpawn] = useState(() =>
     getNewUsername()
+  )
+  const [playerColorToSpawn, setPlayerColorToSpawn] = useState(
+    random(0, 100, false)
   )
 
   useEffect(() => {
@@ -73,7 +83,7 @@ export const MenuLevel = () => {
             <Controller speed={5} authority={"${mainState.cliendId}"} syncId={"${playerIdRef.current}"}>
               <mesh castShadow position={[0, 0.5, 0]} receiveShadow>
                 <boxGeometry args={[0.3, 1, 0.3]} />
-                <meshStandardMaterial color="blue" />
+                <meshStandardMaterial color="${numberToColor(playerColorToSpawn)}" />
               </mesh>
             </Controller>`
 
@@ -84,7 +94,6 @@ export const MenuLevel = () => {
 
   return (
     <Physics normalIndex={2}>
-      {/* <Camera position={[0, 20, 0]} rotation={[-Math.PI / 2, 0, 0]} /> */}
       <Camera />
 
       {/* UI */}
@@ -92,18 +101,42 @@ export const MenuLevel = () => {
       <mesh position={[-10, 0, -10]} rotation={[-Math.PI / 2, 0, 0]}>
         <Container
           backgroundColor="lightGray"
-          width={px(600)}
-          height={px(400)}
+          width={800}
           alignItems="center"
           justifyContent="center"
+          padding={200}
         >
-          <Container flexDirection="column" gap={px(20)}>
+          <Container flexDirection="column" gap={20} width={400}>
             <Input
               value={playerNameToSpawn}
               onValueChange={setPlayerNameToSpawn}
-              width={200}
+              width="100%"
               placeholder="Username"
             />
+            <Container gap={20}>
+              <Label>
+                <Text>Color</Text>
+              </Label>
+              {/* <Slider // Broken in library
+                min={0}
+                max={100}
+                step={1}
+                width={260}
+                // value={playerColorToSpawn}
+                // onValueChange={setPlayerColorToSpawn}
+              /> */}
+              <Input
+                value={`${playerColorToSpawn}`}
+                onValueChange={value => setPlayerColorToSpawn(+value)}
+                width="100%"
+              />
+              <Container
+                flexShrink={0}
+                width={40}
+                height={40}
+                backgroundColor={numberToColor(playerColorToSpawn)}
+              ></Container>
+            </Container>
             <Button onClick={() => joinPlayer()}>
               <Text>Join</Text>
             </Button>

@@ -49,8 +49,6 @@ export const useGetSyncTraitsFromSyncTraitId = (
   ) as any
 }
 
-export const px = (px: number) => `${px}px` as any
-
 export const getNewUsername = () =>
   uniqueNamesGenerator({
     dictionaries: [colors, adjectives, animals],
@@ -96,4 +94,10 @@ export function lerpVector3(
 
   // Return a cancel function if the caller needs it
   return () => rafId && clearTimeout(rafId)
+}
+
+export const numberToColor = (value: number): string => {
+  const clamped = Math.max(0, Math.min(100, value))
+  const hue = (clamped / 100) * 120 // 0° = red, 120° = green
+  return `hsl(${hue}, 100%, 50%)`
 }
