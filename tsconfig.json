@@ -19,7 +19,8 @@
     "strict": true,
     "types": ["@react-three/fiber", "vite/client"],
     "noUnusedLocals": true,
-    "noUnusedParameters": true
+    "noUnusedParameters": true,
+    "downlevelIteration": true
   },
   "exclude": ["node_modules"],
   "include": [".", ".triplex/*"]

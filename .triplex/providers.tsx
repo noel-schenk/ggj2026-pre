@@ -1,5 +1,7 @@
 import { type ReactNode } from 'react'
 
+import { Physics } from '@react-three/rapier'
+
 import { KootaSystems, RootProviders } from '../src/providers'
 
 export function GlobalProvider({ children }: { children: ReactNode }) {
@@ -20,13 +22,15 @@ export function CanvasProvider({
   velocityTowardsTargetSystem?: boolean
 }) {
   return (
-    <KootaSystems
-      cameraFollowFocusedSystem={cameraFollowFocusedSystem}
-      cursorPositionFromLandSystem={cursorPositionFromLandSystem}
-      positionFromVelocitySystem={positionFromVelocitySystem}
-      velocityTowardsTargetSystem={velocityTowardsTargetSystem}
-    >
-      {children}
-    </KootaSystems>
+    <Physics>
+      <KootaSystems
+        cameraFollowFocusedSystem={cameraFollowFocusedSystem}
+        cursorPositionFromLandSystem={cursorPositionFromLandSystem}
+        positionFromVelocitySystem={positionFromVelocitySystem}
+        velocityTowardsTargetSystem={velocityTowardsTargetSystem}
+      >
+        {children}
+      </KootaSystems>
+    </Physics>
   )
 }
