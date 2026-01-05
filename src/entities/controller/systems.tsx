@@ -1,4 +1,5 @@
 import { Land } from '@/entities/land/traits'
+import { Authority } from '@/multiplayer/traits'
 import { distance, multiply, normalize, subtract } from '@/shared/math'
 import { Mesh, Position, Target, Velocity } from '@/shared/traits'
 import { ECSSystemHook } from '@/types'
@@ -20,7 +21,7 @@ export const useVelocityTowardsTarget: ECSSystemHook = () => {
 
   return useCallback(
     (world, delta: number) => {
-      const entities = world.query(Controllable, Position, Velocity)
+      const entities = world.query(Controllable, Position, Velocity, Authority)
       const target = world.queryFirst(Position, Target)
 
       const lands = world.query(Land, Mesh)

@@ -1,7 +1,7 @@
 import { SyncTrait, SyncedTraits } from '@/shared/traits'
 import { mainState } from '@/store'
 
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 
 import { useWorld } from 'koota/react'
 import { attempt, isError, isNil } from 'lodash-es'
