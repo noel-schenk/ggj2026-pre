@@ -4,27 +4,34 @@ import { Land } from '@/entities/land'
 import { MultiplayerPortal, updateMultiplayerPortal } from '@/multiplayer'
 import { Authority } from '@/multiplayer/traits'
 import { SyncTrait } from '@/shared/traits'
+import { mainState } from '@/state'
+import { uuid } from '@/utils'
 
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 
 import { Html } from '@react-three/drei'
 import '@react-three/p2'
 import { Physics } from '@react-three/p2'
 import { useWorld } from 'koota/react'
+import { random } from 'lodash-es'
 import { Vector3 } from 'three'
 
 export function DebugLevel() {
   const world = useWorld()
 
   const PLAYER_SPAWNER_ID = 'player-spawner' as const
+
+  const playerId = useRef(uuid())
   const [playerGroup, setPlayerGroup] = useState(``)
-  const [playerNameToSpawn, setPlayerNameToSpawn] = useState('42')
+  const [playerNameToSpawn, setPlayerNameToSpawn] = useState(
+    `${random(0, 99, false)}`
+  )
 
   const updateAuthorityOnPlayerGroup = () => {
     setTimeout(() => {
       world
         .query(SyncTrait)
-        .find(entity => entity.get(SyncTrait)?.id === playerNameToSpawn)
+        .find(entity => entity.get(SyncTrait)?.id === playerId.current)
         ?.add(Authority)
     }, 1000)
   }
@@ -37,7 +44,7 @@ export function DebugLevel() {
   const joinPlayer = () => {
     const newPlayerGroup = `
             ${playerGroup}
-            <Controller speed={5} syncId={'${playerNameToSpawn}'}>
+            <Controller speed={5} authority={"${mainState.cliendId}"} syncId={"${playerId.current}"}>
               <mesh castShadow position={[0, 0.5, 0]} receiveShadow>
                 <boxGeometry args={[0.3, 1, 0.3]} />
                 <meshStandardMaterial color="blue" />

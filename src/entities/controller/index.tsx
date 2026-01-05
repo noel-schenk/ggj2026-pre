@@ -1,30 +1,32 @@
 import { Keyboard } from '@/entities/keyboard/traits'
 import { Authority } from '@/multiplayer/traits'
 import { Focused, Mesh, Position, SyncTrait, Velocity } from '@/shared/traits'
+import { useGetSyncTraitsFromSyncTraitId } from '@/utils'
 
 import { useEffect, useRef } from 'react'
 
 import { useWorld } from 'koota/react'
-import { type Object3D } from 'three'
+import { type Object3D, Vector3 } from 'three'
 
 import { Controllable, Speed } from './traits'
 
 export function Controller({
   children,
-  position = [0, 0, 0],
+  position = new Vector3(0, 0, 2),
   speed = 1,
-  syncId = '42',
-  authority = false,
+  authority,
+  syncId = '',
 }: {
   children: React.ReactNode
-  position?: [x: number, y: number, z: number]
+  position?: Vector3
   speed?: number
+  authority?: string
   syncId?: string
-  authority?: boolean
 }) {
   const world = useWorld()
   const controllerRef = useRef<Object3D>(null)
-  const [x, y, z] = position
+
+  const syncedTraits = useGetSyncTraitsFromSyncTraitId(syncId)
 
   useEffect(() => {
     if (!controllerRef.current) {
@@ -37,17 +39,17 @@ export function Controller({
       Keyboard,
       Focused,
       Mesh(controllerRef.current),
-      Position({ x, y, z }),
+      Position(syncedTraits.position ? syncedTraits.position : position),
       Speed({ value: speed }),
       Velocity
     )
 
-    if (authority) entity.add(Authority)
+    if (authority) entity.add(Authority({ clientId: authority }))
 
     return () => {
       entity.destroy()
     }
-  }, [speed, world, x, y, z])
+  }, [speed, world, position])
 
   return <group ref={controllerRef}>{children}</group>
 }

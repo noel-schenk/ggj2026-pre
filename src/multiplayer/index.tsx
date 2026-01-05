@@ -1,5 +1,6 @@
 import { SyncTrait, SyncedTraits } from '@/shared/traits'
-import { mainState } from '@/store'
+import { mainState } from '@/state'
+import { assertTrue } from '@/utils'
 
 import { useEffect } from 'react'
 
@@ -19,39 +20,20 @@ export const encode = (object: any) => btoa(JSON.stringify(object))
 
 export const decode = (message: any) => JSON.parse(atob(message))
 
+export const getDecodedClientData = (): { data: any; type: string } => {
+  assertTrue(
+    !isError(attempt(decode, mainState.partyData)),
+    'error decoding serverData'
+  )
+
+  const clientData = decode(mainState.partyData).message // encoded by server
+
+  assertTrue(!isError(attempt(decode, clientData)), 'error decoding clientData')
+
+  return decode(clientData) // encoded by other clients
+}
+
 export const Multiplayer = () => {
-  const world = useWorld()
-
-  subscribeKey(mainState, 'partyData', () => {
-    if (isError(attempt(decode, mainState.partyData))) return
-
-    const data = decode(mainState.partyData) // encoded by server
-
-    if (isNil(data.message)) return
-
-    const syncData = decode(data.message) // encoded by other clients
-
-    if (syncData.type !== 'multiplayer-sync' || isNil(syncData.data)) return
-
-    // only type multiplayer-sync
-
-    const entityWithSyncedTraitsData = syncData.data as SyncedTraitsData
-
-    entityWithSyncedTraitsData.forEach(syncEntity => {
-      const entityToSync = world
-        .query(SyncTrait)
-        .find(entity => entity.get(SyncTrait)?.id === syncEntity.sync.id)
-      if (isNil(entityToSync)) return
-
-      Object.entries(syncEntity).forEach(syncTrait => {
-        const syncName = syncTrait[0] as keyof typeof SyncedTraits
-        const syncData = syncTrait[1]
-        const traitToSync = SyncedTraits[syncName]
-        entityToSync.set(traitToSync, syncData) // this syncs the trait data
-      })
-    })
-  })
-
   mainState.party = usePartySocket({
     host: import.meta.env.VITE_MULTIPLAYER_SERVER,
 
@@ -73,6 +55,43 @@ export const Multiplayer = () => {
     room: 'my-room',
   })
 
+  console.log('server ip: ', import.meta.env.VITE_MULTIPLAYER_SERVER)
+  console.log('client id: ', mainState.party.id)
+
+  return <></>
+}
+
+export const MultiplayerSync = () => {
+  const world = useWorld()
+
+  // On Client Sync received
+  useEffect(() => {
+    const unsubscribe = subscribeKey(mainState, 'partyData', () => {
+      const syncData = getDecodedClientData()
+
+      if (syncData.type !== 'multiplayer-sync' || isNil(syncData.data)) return
+
+      const entityWithSyncedTraitsData = syncData.data as SyncedTraitsData
+
+      entityWithSyncedTraitsData.forEach(syncEntity => {
+        const entityToSync = world
+          .query(SyncTrait)
+          .find(entity => entity.get(SyncTrait)?.id === syncEntity.sync.id)
+        if (isNil(entityToSync)) return
+
+        Object.entries(syncEntity).forEach(syncTrait => {
+          const syncName = syncTrait[0] as keyof typeof SyncedTraits
+          const syncData = syncTrait[1]
+          const traitToSync = SyncedTraits[syncName]
+          entityToSync.set(traitToSync, syncData) // this syncs the trait data
+        })
+      })
+    })
+
+    return unsubscribe
+  }, [])
+
+  // Sync Interval
   useEffect(() => {
     const interval = setInterval(() => {
       world.query()
@@ -100,8 +119,6 @@ export const Multiplayer = () => {
     return () => clearInterval(interval)
   }, [])
 
-  console.log(import.meta.env.VITE_MULTIPLAYER_SERVER)
-
   return <></>
 }
 
@@ -127,10 +144,7 @@ export const MultiplayerPortal = ({
     if (isNil(mainState.party)) return
 
     const unsubscribe = subscribeKey(mainState, 'partyData', () => {
-      if (isError(attempt(decode, mainState.partyData))) return
-
-      const data = decode(mainState.partyData)
-      const spawnData = decode(data.message)
+      const spawnData = getDecodedClientData()
 
       if (spawnData.type !== 'multiplayer-spawn') return
 
