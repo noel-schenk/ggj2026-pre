@@ -5,33 +5,37 @@ import { MultiplayerPortal, updateMultiplayerPortal } from '@/multiplayer'
 import { Authority } from '@/multiplayer/traits'
 import { SyncTrait } from '@/shared/traits'
 import { mainState } from '@/state'
-import { uuid } from '@/utils'
+import { arrayToVector3, getNewUsername, lerpVector3, px, uuid } from '@/utils'
 
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
-import { Html } from '@react-three/drei'
 import '@react-three/p2'
 import { Physics } from '@react-three/p2'
+import { Container, Text } from '@react-three/uikit'
+import { Button, Input } from '@react-three/uikit-default'
 import { useWorld } from 'koota/react'
-import { random } from 'lodash-es'
-import { Vector3 } from 'three'
 
-export function DebugLevel() {
+export const MenuLevel = () => {
   const world = useWorld()
 
   const PLAYER_SPAWNER_ID = 'player-spawner' as const
 
-  const playerId = useRef(uuid())
+  const playerIdRef = useRef(uuid())
   const [playerGroup, setPlayerGroup] = useState(``)
-  const [playerNameToSpawn, setPlayerNameToSpawn] = useState(
-    `${random(0, 99, false)}`
+  const [playerNameToSpawn, setPlayerNameToSpawn] = useState(() =>
+    getNewUsername()
   )
+
+  useEffect(() => {
+    mainState.cameraPosition = [-10.07, 20, -9.2]
+    mainState.cameraRotation = [-Math.PI / 2, 0, 0]
+  }, [])
 
   const updateAuthorityOnPlayerGroup = () => {
     setTimeout(() => {
       world
         .query(SyncTrait)
-        .find(entity => entity.get(SyncTrait)?.id === playerId.current)
+        .find(entity => entity.get(SyncTrait)?.id === playerIdRef.current)
         ?.add(Authority)
     }, 1000)
   }
@@ -42,9 +46,31 @@ export function DebugLevel() {
   }
 
   const joinPlayer = () => {
+    mainState.cameraFollowPlayer = false
+    lerpVector3(
+      arrayToVector3(mainState.cameraPosition),
+      arrayToVector3([-7.57, 16.16, 11.8]),
+      500,
+      newPosition => {
+        mainState.cameraPosition = newPosition.toArray()
+      }
+    )
+    lerpVector3(
+      arrayToVector3(mainState.cameraRotation),
+      arrayToVector3([
+        -0.9332755459863794, -0.28903323954036725, -0.4631507365545853,
+      ]),
+      500,
+      (newRotation, isLast) => {
+        if (isLast)
+          setTimeout(() => (mainState.cameraFollowPlayer = true), 1000)
+        mainState.cameraRotation = newRotation.toArray()
+      }
+    )
+
     const newPlayerGroup = `
             ${playerGroup}
-            <Controller speed={5} authority={"${mainState.cliendId}"} syncId={"${playerId.current}"}>
+            <Controller speed={5} authority={"${mainState.cliendId}"} syncId={"${playerIdRef.current}"}>
               <mesh castShadow position={[0, 0.5, 0]} receiveShadow>
                 <boxGeometry args={[0.3, 1, 0.3]} />
                 <meshStandardMaterial color="blue" />
@@ -58,25 +84,32 @@ export function DebugLevel() {
 
   return (
     <Physics normalIndex={2}>
-      <Camera position={[0, 3, 0]} rotation={[-0.87, -0.56, -0.57]} />
+      {/* <Camera position={[0, 20, 0]} rotation={[-Math.PI / 2, 0, 0]} /> */}
+      <Camera />
 
       {/* UI */}
 
-      <Html position={new Vector3(0, 0, 0)} center>
-        <input
-          onChange={ev => setPlayerNameToSpawn(ev.target.value)}
-          value={playerNameToSpawn}
-        />
-        <button
-          style={{
-            cursor: 'pointer',
-            padding: '10px 20px',
-          }}
-          onClick={() => joinPlayer()}
+      <mesh position={[-10, 0, -10]} rotation={[-Math.PI / 2, 0, 0]}>
+        <Container
+          backgroundColor="lightGray"
+          width={px(600)}
+          height={px(400)}
+          alignItems="center"
+          justifyContent="center"
         >
-          Join
-        </button>
-      </Html>
+          <Container flexDirection="column" gap={px(20)}>
+            <Input
+              value={playerNameToSpawn}
+              onValueChange={setPlayerNameToSpawn}
+              width={200}
+              placeholder="Username"
+            />
+            <Button onClick={() => joinPlayer()}>
+              <Text>Join</Text>
+            </Button>
+          </Container>
+        </Container>
+      </mesh>
 
       <MultiplayerPortal id={PLAYER_SPAWNER_ID} onUpdate={onUpdatePlayerGroup}>
         {playerGroup}

@@ -1,23 +1,21 @@
 import { Mesh, Position } from '@/shared/traits'
+import { mainState } from '@/state'
+import { arrayToVector3 } from '@/utils'
 
 import { useEffect, useRef } from 'react'
 
 import { OrthographicCamera } from '@react-three/drei'
 import { useWorld } from 'koota/react'
 import { type OrthographicCamera as OrthographicCameraImpl } from 'three'
+import { useSnapshot } from 'valtio'
 
 import { Camera as CameraTrait } from './traits'
 
-export function Camera({
-  position = [0, 0, 0],
-  rotation,
-}: {
-  position?: [x: number, y: number, z: number]
-  rotation?: [x: number, y: number, z: number]
-}) {
+export function Camera() {
   const world = useWorld()
+  const mainStateSnap = useSnapshot(mainState)
+
   const cameraRef = useRef<OrthographicCameraImpl>(null)
-  const [x, y, z] = position
 
   useEffect(() => {
     if (!cameraRef.current) {
@@ -25,21 +23,21 @@ export function Camera({
     }
 
     const entity = world.spawn(
-      CameraTrait,
-      Position({ x, y, z }),
+      CameraTrait(),
+      Position(arrayToVector3(mainStateSnap.cameraPosition)),
       Mesh(cameraRef.current)
     )
 
     return () => {
       entity.destroy()
     }
-  }, [world, x, y, z])
+  }, [world, mainStateSnap.cameraPosition])
 
   return (
     <OrthographicCamera
       makeDefault
       ref={cameraRef}
-      rotation={rotation}
+      rotation={mainStateSnap.cameraRotation}
       zoom={100}
     />
   )

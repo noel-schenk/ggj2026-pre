@@ -2,6 +2,7 @@ import { Controllable } from '@/entities/controller/traits'
 import { Authority } from '@/multiplayer/traits'
 import { damp } from '@/shared/math'
 import { Position } from '@/shared/traits'
+import { mainState } from '@/state'
 import { type ECSSystem, type Vector3 } from '@/types'
 
 import { Camera } from './traits'
@@ -18,16 +19,16 @@ export const cameraFollowFocused: ECSSystem = (world, delta) => {
   const focusedPosition = focused?.get(Position)
   const cameraPosition = camera?.get(Position)
 
-  if (!camera || !cameraPosition || !focusedPosition) {
-    return
-  }
+  if (!camera || !cameraPosition || !focusedPosition) return
+
+  if (!mainState.cameraFollowPlayer) return
 
   const lambda = 5
-  const offset = 2
+  const offset = { x: 6, z: 12 }
   const target: Vector3 = {
-    x: focusedPosition.x - offset,
+    x: focusedPosition.x - offset.x,
     y: cameraPosition.y,
-    z: focusedPosition.z + offset,
+    z: focusedPosition.z + offset.z,
   }
 
   if (cameraPosition.x === 0 && cameraPosition.z === 0) {
