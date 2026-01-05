@@ -3,7 +3,7 @@ import { useVelocityTowardsTarget } from '@/entities/controller/systems'
 import { useCursorPositionFromLand } from '@/entities/land/systems'
 import { meshFromPosition, positionFromVelocity } from '@/shared/systems'
 
-import { type ReactNode, createContext, use, useMemo } from 'react'
+import { type ReactNode, createContext, use } from 'react'
 
 import { useFrame } from '@react-three/fiber'
 import { createWorld } from 'koota'
@@ -11,9 +11,9 @@ import { WorldProvider, useWorld } from 'koota/react'
 
 import { keyboardVelocitySystem } from './entities/keyboard/systems'
 
-export function RootProviders({ children }: { children: ReactNode }) {
-  const world = useMemo(() => createWorld(), [])
+export const world = createWorld()
 
+export function RootProviders({ children }: { children: ReactNode }) {
   return <WorldProvider world={world}>{children}</WorldProvider>
 }
 

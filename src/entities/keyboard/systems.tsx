@@ -1,6 +1,7 @@
 import { Controllable } from '@/entities/controller/traits'
 import { Authority } from '@/multiplayer/traits'
-import { Velocity } from '@/shared/traits'
+import { world } from '@/providers'
+import { Position, Target, Velocity } from '@/shared/traits'
 import { type ECSSystem } from '@/types'
 
 import { Vector3 } from 'three'
@@ -39,7 +40,10 @@ export const keyboardVelocitySystem: ECSSystem = (world, _delta) => {
   }
 }
 
-const onKeydown = (event: KeyboardEvent) => keyDown.add(event.key)
+const onKeydown = (event: KeyboardEvent) => {
+  world.query(Target).forEach(entity => entity.remove(Position))
+  keyDown.add(event.key)
+}
 
 const onKeyup = (event: KeyboardEvent) => keyDown.delete(event.key)
 
