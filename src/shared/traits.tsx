@@ -22,5 +22,5 @@ export const SyncTrait = trait({ id: '' })
 export const SyncedTraits = {
   position: Position,
   sync: SyncTrait,
-  // velocity: Velocity,
+  velocity: Velocity,
 }

@@ -11,15 +11,12 @@ interface RoomData {
 }
 
 function getRoomConnectionsAsArray(room: Party.Room) {
-  const connections = room.getConnections()
-  const result = []
-  for (const c of connections) {
-    result.push(c)
-  }
-  return result
+  return [...room.getConnections()]
 }
 
 export default class Server implements Party.Server {
+  authority: null | string = null
+
   constructor(readonly room: Party.Room) {
     if (!rooms.has(room) && room.name != LobbyName) {
       console.log('adding room:', room.id, room.name)
@@ -31,8 +28,28 @@ export default class Server implements Party.Server {
     const connections = getRoomConnectionsAsArray(this.room).filter(
       c => c.id !== connection.id
     )
+
     if (connections.length == 0) {
       rooms.delete(this.room)
+      this.authority = null
+    }
+
+    if (this.authority === connection.id) {
+      // the authority left pick new one!
+      if (connections.length > 0) {
+        const connection = connections.pop()!
+        this.authority = connection.id
+        this.room.broadcast(
+          encode({
+            data: {
+              authority: this.authority,
+            },
+            type: 'authority-sync',
+          } as MessageLayout<'authority-sync'>)
+        )
+      } else {
+        this.authority = null
+      }
     }
   }
 
@@ -45,9 +62,21 @@ export default class Server implements Party.Server {
         room: ${this.room.id}
         url: ${new URL(ctx.request.url).pathname}`
     )
+    if (this.authority === null) {
+      this.authority = conn.id
+    }
 
     console.log('name', this.room.name)
     console.log('id', this.room.id)
+
+    conn.send(
+      encode({
+        data: {
+          authority: this.authority,
+        },
+        type: 'authority-sync',
+      } as MessageLayout<'authority-sync'>)
+    )
 
     if (this.room.id === LobbyName) {
       const availableRooms: RoomData[] = []
@@ -60,7 +89,6 @@ export default class Server implements Party.Server {
         } as RoomData)
       })
       console.log(availableRooms)
-      conn.send(JSON.stringify(availableRooms))
     }
 
     // let's send a message to the connection
@@ -69,11 +97,17 @@ export default class Server implements Party.Server {
   onMessage(message: string, sender: Party.Connection) {
     // as well as broadcast it to all the other connections in the room...
     this.room.broadcast(
-      btoa(JSON.stringify({ message: message, sender: sender.id })),
+      message,
       // ...except for the connection it came from
       [sender.id]
     )
   }
 }
+
+export const encode = <T extends keyof MessageTypes>(
+  object: MessageLayout<T>
+) => btoa(JSON.stringify(object))
+
+export const decode = (message: any) => JSON.parse(atob(message))
 
 Server satisfies Party.Worker

@@ -17,7 +17,7 @@
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "strict": true,
-    "types": ["@react-three/fiber", "vite/client"],
+    "types": ["@react-three/fiber", "vite/client", "types"],
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "downlevelIteration": true

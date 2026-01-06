@@ -3,6 +3,7 @@ import { Physics } from '@react-three/rapier'
 
 import { MenuLevel } from './levels/menu'
 import { Multiplayer, MultiplayerSync } from './multiplayer'
+import { MultiplayerHandlers } from './multiplayer/messageHandler'
 import { KootaSystems } from './providers'
 
 export function App() {
@@ -13,6 +14,7 @@ export function App() {
           <MenuLevel />
           <Multiplayer />
           <MultiplayerSync />
+          <MultiplayerHandlers />
         </KootaSystems>
       </Physics>
     </Canvas>

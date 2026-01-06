@@ -1,5 +1,5 @@
 import { Controllable } from '@/entities/controller/traits'
-import { Authority } from '@/multiplayer/traits'
+import { Owner } from '@/multiplayer/traits'
 import { damp } from '@/shared/math'
 import { Position, RigidBody } from '@/shared/traits'
 import { mainState } from '@/state'
@@ -13,7 +13,7 @@ import { Camera } from './traits'
  * made.
  */
 export const cameraFollowFocused: ECSSystem = (world, delta) => {
-  const focused = world.queryFirst(Authority, Controllable, RigidBody)
+  const focused = world.queryFirst(Owner, Controllable, RigidBody)
   const camera = world.queryFirst(Camera, Position)
 
   const focusedRigidBody = focused?.get(RigidBody)

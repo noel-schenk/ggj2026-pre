@@ -2,7 +2,7 @@ import { Camera } from '@/entities/camera'
 import { Cursor } from '@/entities/cursor'
 import { Land } from '@/entities/land'
 import { MultiplayerPortal, updateMultiplayerPortal } from '@/multiplayer'
-import { Authority } from '@/multiplayer/traits'
+import { Owner } from '@/multiplayer/traits'
 import { SyncTrait } from '@/shared/traits'
 import { mainState } from '@/state'
 import {
@@ -45,7 +45,7 @@ export const MenuLevel = () => {
       world
         .query(SyncTrait)
         .find(entity => entity.get(SyncTrait)?.id === playerIdRef.current)
-        ?.add(Authority)
+        ?.add(Owner)
     }, 1000)
   }
 
@@ -79,7 +79,7 @@ export const MenuLevel = () => {
 
     const newPlayerGroup = `
             ${playerGroup}
-            <Controller speed={5} color={"${numberToColor(playerColorToSpawn)}"} authority={"${mainState.cliendId}"} syncId={"${playerIdRef.current}"} />`
+            <Controller speed={5} color={"${numberToColor(playerColorToSpawn)}"} owner={"${mainState.clientId}"} syncId={"${playerIdRef.current}"} />`
 
     updateMultiplayerPortal(PLAYER_SPAWNER_ID, newPlayerGroup) // Update remote Clients
     setPlayerGroup(newPlayerGroup) // Update this client

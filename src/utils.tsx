@@ -20,12 +20,10 @@ export const arrayToVector3 = (
   data: readonly [x: number, y: number, z: number]
 ) => new Vector3(data[0], data[1], data[2])
 
-type AssertTrue = (
+export function assertTrue(
   condition: boolean,
   message?: string
-) => asserts condition is true
-
-export const assertTrue: AssertTrue = (condition, message?) => {
+): asserts condition {
   if (!condition) throw new Error(message || 'Assertion failed: expected true')
 }
 

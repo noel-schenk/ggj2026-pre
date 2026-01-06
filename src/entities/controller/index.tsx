@@ -1,5 +1,5 @@
 import { Keyboard } from '@/entities/keyboard/traits'
-import { Authority } from '@/multiplayer/traits'
+import { Owner } from '@/multiplayer/traits'
 import {
   Focused,
   Mesh,
@@ -8,7 +8,7 @@ import {
   SyncTrait,
   Velocity,
 } from '@/shared/traits'
-import { mainState } from '@/state'
+import { isAuthority, mainState } from '@/state'
 import { useGetSyncTraitsFromSyncTraitId } from '@/utils'
 
 import { useEffect, useRef } from 'react'
@@ -22,26 +22,27 @@ import { Text } from '@react-three/uikit'
 import { Label } from '@react-three/uikit-default'
 import { useWorld } from 'koota/react'
 import { Object3D, Vector3 } from 'three'
+import { useSnapshot } from 'valtio'
 
 import { Controllable, Speed } from './traits'
 
 export function Controller({
   position = new Vector3(0, 0, 0),
   speed = 1,
-  authority,
+  owner = '',
   syncId = '',
   color = 'hsl(0, 100%, 50%)',
 }: {
   position?: Vector3
   speed?: number
-  authority?: string
+  owner?: string
   syncId?: string
   color?: string
 }) {
   const world = useWorld()
   const controllerRef = useRef<RapierRigidBody>(null)
   const meshRef = useRef<Object3D>(null)
-
+  const snap = useSnapshot(mainState)
   const syncedTraits = useGetSyncTraitsFromSyncTraitId(syncId)
 
   useEffect(() => {
@@ -60,19 +61,23 @@ export function Controller({
       Velocity
     )
 
-    if (authority === mainState.cliendId) {
-      entity.add(Authority({ clientId: authority }))
+    if (owner === mainState.clientId) {
+      entity.add(Owner({ clientId: owner }))
+      // entity.add(RigidBody(controllerRef.current as any))
+    }
+
+    if (isAuthority()) {
       entity.add(RigidBody(controllerRef.current as any))
     }
 
     return () => {
       entity.destroy()
     }
-  }, [speed, world, position, authority])
+  }, [speed, world, position, owner, snap.authorityId])
 
   return (
     <>
-      {authority === mainState.cliendId && (
+      {isAuthority() && (
         <RigidBodyComponent
           canSleep={false}
           type="dynamic"

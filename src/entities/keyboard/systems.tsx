@@ -1,5 +1,5 @@
 import { Controllable } from '@/entities/controller/traits'
-import { Authority } from '@/multiplayer/traits'
+import { Owner } from '@/multiplayer/traits'
 import { world } from '@/providers'
 import { Position, Target, Velocity } from '@/shared/traits'
 import { type ECSSystem } from '@/types'
@@ -14,7 +14,7 @@ const keyDown = new Set() as Set<string>
  * made.
  */
 export const keyboardVelocitySystem: ECSSystem = (world, _delta) => {
-  const controllables = world.query(Authority, Controllable)
+  const controllables = world.query(Owner, Controllable)
 
   if (controllables.length === 0) {
     return

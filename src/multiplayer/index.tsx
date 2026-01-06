@@ -10,31 +10,28 @@ import usePartySocket from 'partysocket/react'
 import { subscribeKey } from 'valtio/utils'
 
 import { Parse } from './parse'
-import { Authority } from './traits'
+import { Owner } from './traits'
 
 type SyncedTraitsData = {
   [K in keyof typeof SyncedTraits]: any
 }[]
 
-export const encode = (object: any) => btoa(JSON.stringify(object))
+export const encode = <T extends keyof MessageTypes>(
+  object: MessageLayout<T>
+) => btoa(JSON.stringify(object))
 
 export const decode = (message: any) => JSON.parse(atob(message))
 
-export const getDecodedClientData = (): { data: any; type: string } => {
-  assertTrue(
-    !isError(attempt(decode, mainState.partyData)),
-    'error decoding serverData'
-  )
-
-  const clientData = decode(mainState.partyData).message // encoded by server
-
-  assertTrue(!isError(attempt(decode, clientData)), 'error decoding clientData')
-
-  return decode(clientData) // encoded by other clients
+export const getDecodedClientData = (
+  clientData: string
+): MessageLayout<keyof MessageTypes> => {
+  const result = attempt(decode, clientData)
+  assertTrue(!isError(result), 'error decoding clientData')
+  return result // encoded by other clients
 }
 
 export const Multiplayer = () => {
-  mainState.party = usePartySocket({
+  mainState.client = usePartySocket({
     host: import.meta.env.VITE_MULTIPLAYER_SERVER,
 
     onClose() {
@@ -46,14 +43,19 @@ export const Multiplayer = () => {
     },
 
     onMessage(e) {
-      mainState.partyData = e.data
+      mainState.partyData = getDecodedClientData(e.data)
     },
     // TODO: make use of rooms
     onOpen(ev) {
       console.log('connected as:', (ev!.target! as any).id)
-      mainState.cliendId = (ev!.target! as any).id
+      console.log('ev:', ev)
+
+      assertTrue(!isNil(mainState.client))
+
+      mainState.clientId = mainState.client.id
+      mainState.connectedSince = Date.now()
     },
-    room: 'my-room',
+    room: 'my-room2',
   })
 
   // console.log('server ip: ', import.meta.env.VITE_MULTIPLAYER_SERVER)
@@ -68,9 +70,13 @@ export const MultiplayerSync = () => {
   // On Client Sync received
   useEffect(() => {
     const unsubscribe = subscribeKey(mainState, 'partyData', () => {
-      const syncData = getDecodedClientData()
-
-      if (syncData.type !== 'multiplayer-sync' || isNil(syncData.data)) return
+      const syncData = mainState.partyData
+      if (
+        !syncData ||
+        syncData.type !== 'multiplayer-sync' ||
+        isNil(syncData.data)
+      )
+        return
 
       const entityWithSyncedTraitsData = syncData.data as SyncedTraitsData
 
@@ -98,7 +104,7 @@ export const MultiplayerSync = () => {
       world.query()
 
       const entityWithSyncedTraitsData = world
-        .query(Authority)
+        .query(Owner)
         .map(entity =>
           Object.fromEntries(
             Object.entries(SyncedTraits).map(([key, trait]) => [
@@ -108,8 +114,8 @@ export const MultiplayerSync = () => {
           )
         )
 
-      if (isNil(mainState.party)) return
-      mainState.party.send(
+      if (isNil(mainState.client)) return
+      mainState.client.send(
         encode({
           data: entityWithSyncedTraitsData,
           type: 'multiplayer-sync',
@@ -142,12 +148,13 @@ export const MultiplayerPortal = ({
   onUpdate,
 }: MultiplayerPortalProps) => {
   useEffect(() => {
-    if (isNil(mainState.party)) return
+    if (isNil(mainState.client)) return
 
     const unsubscribe = subscribeKey(mainState, 'partyData', () => {
-      const spawnData = getDecodedClientData()
+      const spawnData = mainState.partyData
+      if (!spawnData || spawnData.type !== 'multiplayer-spawn') return
 
-      if (spawnData.type !== 'multiplayer-spawn') return
+      console.log(spawnData)
 
       const childrenData = spawnData.data
 
@@ -155,15 +162,15 @@ export const MultiplayerPortal = ({
     })
 
     return unsubscribe
-  }, [mainState.party])
+  }, [mainState.client])
 
   return <Parse tsx={children} />
 }
 
 export const updateMultiplayerPortal = (id: string, children: string) => {
-  if (isNil(mainState.party)) return
+  if (isNil(mainState.client)) return
 
-  mainState.party.send(
+  mainState.client.send(
     encode({
       data: {
         children: children,
