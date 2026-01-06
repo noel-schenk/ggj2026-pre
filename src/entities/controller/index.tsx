@@ -8,12 +8,13 @@ import {
   SyncTrait,
   Velocity,
 } from '@/shared/traits'
+import { mainState } from '@/state'
 import { useGetSyncTraitsFromSyncTraitId } from '@/utils'
 
 import { useEffect, useRef } from 'react'
 
 import {
-  MeshCollider,
+  CapsuleCollider,
   RapierRigidBody,
   RigidBody as RigidBodyComponent,
 } from '@react-three/rapier'
@@ -25,17 +26,17 @@ import { Object3D, Vector3 } from 'three'
 import { Controllable, Speed } from './traits'
 
 export function Controller({
-  children,
   position = new Vector3(0, 0, 0),
   speed = 1,
   authority,
   syncId = '',
+  color = 'hsl(0, 100%, 50%)',
 }: {
-  children: React.ReactNode
   position?: Vector3
   speed?: number
   authority?: string
   syncId?: string
+  color?: string
 }) {
   const world = useWorld()
   const controllerRef = useRef<RapierRigidBody>(null)
@@ -44,7 +45,7 @@ export function Controller({
   const syncedTraits = useGetSyncTraitsFromSyncTraitId(syncId)
 
   useEffect(() => {
-    if (!controllerRef.current) {
+    if (!meshRef.current) {
       return
     }
 
@@ -54,37 +55,46 @@ export function Controller({
       Keyboard,
       Focused,
       Mesh(meshRef.current as any),
-      RigidBody(controllerRef.current as any),
       Position(syncedTraits.position ? syncedTraits.position : position),
       Speed({ value: speed }),
       Velocity
     )
 
-    if (authority) entity.add(Authority({ clientId: authority }))
+    if (authority === mainState.cliendId) {
+      entity.add(Authority({ clientId: authority }))
+      entity.add(RigidBody(controllerRef.current as any))
+    }
 
     return () => {
       entity.destroy()
     }
-  }, [speed, world, position])
+  }, [speed, world, position, authority])
 
   return (
     <>
-      <RigidBodyComponent
-        canSleep={false}
-        type="dynamic"
-        colliders={false}
-        linearDamping={4}
-        angularDamping={5}
-        mass={100}
-        ref={controllerRef}
-      >
-        <MeshCollider type="ball">{children}</MeshCollider>
-      </RigidBodyComponent>
+      {authority === mainState.cliendId && (
+        <RigidBodyComponent
+          canSleep={false}
+          type="dynamic"
+          colliders={false}
+          linearDamping={4}
+          angularDamping={4}
+          enabledRotations={[false, false, false]}
+          mass={100}
+          ref={controllerRef}
+        >
+          <CapsuleCollider args={[0.4, 0.3]}></CapsuleCollider>
+        </RigidBodyComponent>
+      )}
+
       <group ref={meshRef}>
         <Label>
           <Text>{JSON.stringify(position)}</Text>
         </Label>
-        {children}
+        <mesh castShadow position={[0, 0, 0]} receiveShadow>
+          <boxGeometry args={[0.3, 1, 0.3]} />
+          <meshStandardMaterial color={color} />
+        </mesh>
       </group>
     </>
   )

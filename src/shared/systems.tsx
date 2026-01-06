@@ -13,24 +13,25 @@ export const meshFromPosition: ECSSystem = world => {
 
   for (const entity of entities) {
     const mesh = entity.get(Mesh)
+    const meshRealPosition = mesh?.getWorldPosition(new Vector3(0, 0, 0))
     const position = entity.get(Position)
     const controllable = entity.get(Controllable)
     const authority = entity.get(Authority)
     const rb = entity.get(RigidBody)
 
-    if (mesh && position && !controllable) {
+    if (mesh && position) {
       mesh.position.set(position.x, position.y, position.z)
     }
-    if (mesh && position && controllable) {
+    if (rb && position && meshRealPosition && controllable) {
       if (authority) {
-        const pos = mesh.getWorldPosition(new Vector3(0, 0, 0))
-        entity.set(Position, pos)
+        entity.set(Position, meshRealPosition)
       } else {
-        rb?.setTranslation(position, false)
+        rb?.setTranslation(position, true)
       }
     }
   }
 
+  // move RB by using force!
   const entitiesR = world.query(Velocity, RigidBody)
   for (const entity of entitiesR) {
     const rb = entity.get(RigidBody)

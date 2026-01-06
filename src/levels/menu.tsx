@@ -79,12 +79,7 @@ export const MenuLevel = () => {
 
     const newPlayerGroup = `
             ${playerGroup}
-            <Controller speed={5} authority={"${mainState.cliendId}"} syncId={"${playerIdRef.current}"}>
-              <mesh castShadow position={[0, 0.5, 0]} receiveShadow>
-                <boxGeometry args={[0.3, 1, 0.3]} />
-                <meshStandardMaterial color="${numberToColor(playerColorToSpawn)}" />
-              </mesh>
-            </Controller>`
+            <Controller speed={5} color={"${numberToColor(playerColorToSpawn)}"} authority={"${mainState.cliendId}"} syncId={"${playerIdRef.current}"} />`
 
     updateMultiplayerPortal(PLAYER_SPAWNER_ID, newPlayerGroup) // Update remote Clients
     setPlayerGroup(newPlayerGroup) // Update this client

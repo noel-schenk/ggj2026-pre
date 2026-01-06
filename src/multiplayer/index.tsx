@@ -49,14 +49,15 @@ export const Multiplayer = () => {
       mainState.partyData = e.data
     },
     // TODO: make use of rooms
-    onOpen() {
-      console.log('connected')
+    onOpen(ev) {
+      console.log('connected as:', (ev!.target! as any).id)
+      mainState.cliendId = (ev!.target! as any).id
     },
     room: 'my-room',
   })
 
-  console.log('server ip: ', import.meta.env.VITE_MULTIPLAYER_SERVER)
-  console.log('client id: ', mainState.party.id)
+  // console.log('server ip: ', import.meta.env.VITE_MULTIPLAYER_SERVER)
+  // console.log('client id: ', mainState.party.id)
 
   return <></>
 }
