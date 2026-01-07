@@ -2,6 +2,9 @@ import PartySocket from 'partysocket'
 import { proxy } from 'valtio'
 
 interface MainState {
+  /** indicated if this is a debug build */
+  debug: boolean
+
   client: PartySocket | null
   partyData: MessageLayout<keyof MessageTypes> | null
   clientId: string
@@ -21,9 +24,14 @@ export const mainState = proxy<MainState>({
   client: null,
   clientId: '',
   connectedSince: 0,
+  debug: false,
   partyData: null,
 })
 
 export const isAuthority = (): boolean => {
   return mainState.clientId === mainState.authorityId
+}
+
+export const isDebug = () => {
+  return mainState.debug
 }

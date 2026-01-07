@@ -1,3 +1,5 @@
+import { mainState } from '@/state'
+
 import { type ReactNode } from 'react'
 
 import { Physics } from '@react-three/rapier'
@@ -21,8 +23,9 @@ export function CanvasProvider({
   positionFromVelocitySystem?: boolean
   velocityTowardsTargetSystem?: boolean
 }) {
+  mainState.debug = true
   return (
-    <Physics>
+    <Physics debug>
       <KootaSystems
         cameraFollowFocusedSystem={cameraFollowFocusedSystem}
         cursorPositionFromLandSystem={cursorPositionFromLandSystem}
